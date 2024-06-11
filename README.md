@@ -16,3 +16,5 @@ usage: shebangaroo.sh <path> [regex-search] [max_size]
 - example of regex search could be: `python`
 - max_size will default to 128k unless spefified
 ```
+
+> tangentially related to: [this topic on the Alfred forums](https://www.alfredforum.com/topic/21940-not-quite-a-bug-updating-a-workflow-should-not-automatically-enable-it-if-disabled/?do=findComment&comment=114168)
