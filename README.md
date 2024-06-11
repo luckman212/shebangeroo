@@ -1,4 +1,4 @@
-<img src="./icon.png" width="80" />
+<img src="./icon.png" width="128" />
 
 # shebangeroo
 
