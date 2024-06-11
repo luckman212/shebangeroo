@@ -37,25 +37,28 @@ cat <<EOF > $ERR_LOG
   |
 EOF
 
-c=0 ; st=$(date +%s)
+bad=0 ; fc=0; st=$(date +%s)
 while read -r -u3 FILENAME ; do
 	read -r SHEBANG < "$FILENAME"
 	echo "script:  $FILENAME"
 	echo "shebang: $SHEBANG"
 	INTERPRETER=${SHEBANG:2}
 	for a in ${=INTERPRETER} ; do
+		a=${a//$'\r'/}  # handle Windows encoding
 		[[ $a == /usr/bin/env ]] && continue
 		[[ $a == -* ]] && continue
+		[[ -z $a ]] && continue
 		if ! command -v "$a" >/dev/null 2>&1 ; then
-			_red "*** error: \`$a\` does not appear valid"
-			(( c == 0 )) && echo '' >> $ERR_LOG
+			_red "*** error: $a does not appear valid"
+			(( bad == 0 )) && echo '' >> $ERR_LOG
 			echo "$FILENAME" >> $ERR_LOG
-			(( c++ ))
+			(( bad++ ))
 		else
 			echo "ok $(_green '✔')"
 		fi
 		break
 	done
+	(( fc++ ))
 done 3< <(
 	find "$SEARCH_PATH" -type f -size -$MAX_SIZE -exec sh -c '
 	for f; do
@@ -69,12 +72,13 @@ done 3< <(
 et=$(date +%s)
 elapsed=$(( et - st ))
 
-(( c > 0 )) && echo '' >> $ERR_LOG
+(( bad > 0 )) && echo '' >> $ERR_LOG
 cat <<EOF >> $ERR_LOG
   |
 ==> run completed on $(date)
   | elapsed time: $elapsed second(s)
-  | $c bad shebang(s) found!
+  | files checked: $fc
+  | bad shebang(s) found: $bad
   \____________________________________________________________________________
 
 EOF
