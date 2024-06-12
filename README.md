@@ -14,7 +14,7 @@ You can specify some additional args to control the behavior, such as limiting t
 usage: shebangaroo.sh <path> [regex-search] [max_size]
 - use . or leave blank to default to current dir
 - example of regex search could be: `python`
-- max_size will default to 512k unless spefified
+- max_size: files > this value will not be checked (defaults to 512k)
 ```
 
 > tangentially related to: [this topic on the Alfred forums](https://www.alfredforum.com/topic/21940-not-quite-a-bug-updating-a-workflow-should-not-automatically-enable-it-if-disabled/?do=findComment&comment=114168)
