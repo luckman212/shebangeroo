@@ -63,8 +63,7 @@ done 3< <(
 	find "$SEARCH_PATH" -type f -size -$MAX_SIZE -exec sh -c '
 	for f; do
 		bytes=$(dd if="$f" bs=1 count=3 2>/dev/null)
-		[[ $bytes == "#!/" ]] || continue
-		awk '\''NR==1 {if (/^#!/) {print FILENAME}; exit}'\'' "$f"
+		[[ $bytes == "#!/" ]] && echo "$f"
 	done'	\
 	sh {} +
 )
