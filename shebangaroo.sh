@@ -10,14 +10,22 @@ _usage() {
 	EOF
 }
 
+_timestamp() {
+	local t=${EPOCHREALTIME/.}
+	echo ${t[1,13]}
+}
+
 case $1 in
 	-h|--help) _usage "${0:t}"; exit;;
 esac
 
+zmodload zsh/datetime
+
 SEARCH_PATH=${1:-$PWD}
 SEARCH_RE=${2:-}
 MAX_SIZE=${3:-512k}
-ERR_LOG='/private/tmp/errors.txt'
+ERR_LOG="/tmp/${0:t}_$(_timestamp)_errors.txt"
+CR=$'\n'
 
 _red() { printf '\e[1;31m%s\e[0m\n' "$1"; }
 _green() { printf '\e[1;32m%s\e[0m\n' "$1"; }
@@ -31,18 +39,24 @@ _abort() {
 }
 trap _abort SIGINT SIGTERM
 
+# validate search path
+SEARCH_PATH=$(realpath -q $SEARCH_PATH)
+[[ -e $SEARCH_PATH ]] || { echo >&2 "invalid search path"; exit 1; }
+
 cat <<EOF > $ERR_LOG
 ==> run started on $(date)
-  | path: ${SEARCH_PATH}
+  | path: ${SEARCH_PATH}${SEARCH_RE:+$CR  | regex: $SEARCH_RE}
   |
 EOF
 
 bad=0 ; fc=0; st=$(date +%s)
 while read -r -u3 FILENAME ; do
+	[[ $DEBUG == true ]] && echo >&2 "processing: $FILENAME"
 	read -r SHEBANG < "$FILENAME"
+	INTERPRETER=${SHEBANG:2}
+	[[ -n $SEARCH_RE ]] && [[ ! $INTERPRETER =~ $SEARCH_RE ]] && continue
 	echo "script:  $FILENAME"
 	echo "shebang: $SHEBANG"
-	INTERPRETER=${SHEBANG:2}
 	for a in ${=INTERPRETER} ; do
 		a=${a//$'\r'/}  # handle Windows encoding
 		[[ $a == /usr/bin/env ]] && continue

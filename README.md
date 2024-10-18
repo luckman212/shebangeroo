@@ -1,6 +1,6 @@
 <img src="./icon.png" width="128" />
 
-# shebangeroo
+# shebangaroo
 
 Recurses over a directory looking for scripts, and tests the ones it finds to make sure they have valid interpreters.
 
