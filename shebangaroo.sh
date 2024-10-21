@@ -96,6 +96,12 @@ cat <<EOF >> $ERR_LOG
 
 EOF
 
-[[ -s $ERR_LOG ]] && open $ERR_LOG
+if [[ -s $ERR_LOG ]]; then
+	if [[ -z $SSH_CONNECTION ]]; then
+		open $ERR_LOG
+	else
+		cat $ERR_LOG
+	fi
+fi
 
 trap - SIGINT SIGTERM
